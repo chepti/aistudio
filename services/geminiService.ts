@@ -19,25 +19,12 @@ export const generateStoryForWord = async (word: string, modelName: string): Pro
   const prompt = `You are a helpful assistant creating a very simple and short story for a child learning English. The story MUST include the English word: "${word}". Make the story easy to understand, memorable, and focused on the meaning of the word "${word}". The story should be in English, and consist of 2-3 short sentences.`;
 
   try {
-    const response = await model.generateContent({
-      contents: prompt,
-      config: {
-        temperature: 0.7, // A bit creative but not too wild
-        topK: 40,
-        topP: 0.95,
-        // thinkingConfig: { thinkingBudget: 0 } // For faster, potentially less nuanced responses if needed
-      }
-    });
-    
-    const text = response.text;
-    if (!text) {
-      throw new Error("No text returned from API.");
-    }
-    return text.trim();
+    const result = await model.generateContent(prompt);
+    const response = result.response;
+    const text = response.text();
+    return text;
   } catch (error) {
-    console.error("Error generating story with Gemini API:", error);
-    // It's good to check for specific error types from the SDK if available
-    // For now, re-throwing a generic error message.
-    throw new Error(`Failed to generate story for "${word}". Please try again. Details: ${error instanceof Error ? error.message : String(error)}`);
+    console.error(`Failed to generate story for "${word}". Please try again. Details:`, error);
+    throw new Error(`Failed to generate story for "${word}". Please try again.`);
   }
 };
