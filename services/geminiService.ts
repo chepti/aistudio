@@ -1,37 +1,25 @@
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { UI_TEXT } from '../constants';
 
-import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
-// This function simulates getting the API key. In a real scenario,
-// it should be securely managed and accessed, e.g. via environment variables.
-// For client-side browser environments, this is tricky and usually involves a backend proxy.
-// For this example, we'll assume it's globally available or passed if needed.
-const getApiKey = (): string => {
-  // Attempt to get from a global variable (e.g., set in index.html or via build)
-  // Or directly from process.env if available (more for Node.js context, but bundlers can handle it)
-  const apiKey = (window as any).GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env.API_KEY : undefined);
-  if (!apiKey) {
-    console.error("API Key for Gemini is not configured.");
-    // For a production app, you might throw an error or return a specific status
-    // For now, returning an empty string to let the caller handle it.
-    return ""; 
-  }
-  return apiKey;
-};
+if (!API_KEY) {
+  console.error(UI_TEXT.NO_API_KEY_CONSOLE_ERROR);
+}
 
+const ai = new GoogleGenerativeAI(API_KEY!);
 
 export const generateStoryForWord = async (word: string, modelName: string): Promise<string> => {
-  const apiKey = getApiKey();
-  if (!apiKey) {
-    throw new Error("API Key is not available. Cannot generate story.");
+  if (!API_KEY) {
+    throw new Error(UI_TEXT.NO_API_KEY_MESSAGE);
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const model = ai.getGenerativeModel({ model: modelName });
 
   const prompt = `You are a helpful assistant creating a very simple and short story for a child learning English. The story MUST include the English word: "${word}". Make the story easy to understand, memorable, and focused on the meaning of the word "${word}". The story should be in English, and consist of 2-3 short sentences.`;
 
   try {
-    const response: GenerateContentResponse = await ai.models.generateContent({
-      model: modelName,
+    const response = await model.generateContent({
       contents: prompt,
       config: {
         temperature: 0.7, // A bit creative but not too wild

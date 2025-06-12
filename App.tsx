@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect } from 'react';
 import { Word } from './types';
 import { UI_TEXT, GEMINI_MODEL_TEXT } from './constants';
@@ -9,25 +8,18 @@ import { speakText } from './services/speechService';
 import { Info } from 'lucide-react';
 
 
-// This would typically be process.env.API_KEY, but for web-based example, we check its availability.
-const IS_API_KEY_CONFIGURED = typeof process !== 'undefined' && process.env && process.env.API_KEY && process.env.API_KEY.trim() !== '';
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const IS_API_KEY_CONFIGURED = API_KEY && API_KEY.trim() !== '';
 
 const App: React.FC = () => {
   const [words, setWords] = useState<Word[]>([]);
-  const [apiKeyAvailable, setApiKeyAvailable] = useState<boolean>(false);
-  const [showApiKeyWarning, setShowApiKeyWarning] = useState<boolean>(false);
+  
+  // The availability of the API key is now determined at build time.
+  const apiKeyAvailable = IS_API_KEY_CONFIGURED;
+  const [showApiKeyWarning, setShowApiKeyWarning] = useState<boolean>(!IS_API_KEY_CONFIGURED);
 
   useEffect(() => {
-    // In a real build process, process.env.API_KEY would be substituted.
-    // For this environment, we simulate checking if it might have been configured.
-    // If process.env.API_KEY is not available or empty, features requiring it will be limited.
-    const key = (window as any).GEMINI_API_KEY || (typeof process !== 'undefined' && process.env.API_KEY);
-    if (key && key.trim() !== '') {
-      setApiKeyAvailable(true);
-      setShowApiKeyWarning(false);
-    } else {
-      setApiKeyAvailable(false);
-      setShowApiKeyWarning(true);
+    if (!IS_API_KEY_CONFIGURED) {
       console.warn(UI_TEXT.NO_API_KEY_MESSAGE);
     }
   }, []);
