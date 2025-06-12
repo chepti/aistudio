@@ -1,10 +1,10 @@
 import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
 import type { CharacterInput, GeminiStoryResponse } from '../types';
 
-const API_KEY = import.meta.env.VITE_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 if (!API_KEY) {
-  console.error("VITE_API_KEY is not set. Please ensure the .env.local file has VITE_API_KEY configured and the server is restarted.");
+  console.error("VITE_GEMINI_API_KEY is not set. Please ensure the .env.local file has VITE_GEMINI_API_KEY configured and the server is restarted.");
   // Potentially throw an error or handle this scenario more gracefully depending on application requirements.
   // For this example, we'll let operations fail if the key is missing, and the UI should show an error.
 }
